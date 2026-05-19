@@ -1,0 +1,1773 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3LG Turismo — CRM v10.1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ─── RESET & VARIABLES ─────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #07090f;
+    --surface:   #0d1117;
+    --surface2:  #161b24;
+    --surface3:  #1e2533;
+    --border:    #242c3a;
+    --border2:   #2e3847;
+    --gold:      #c9a84c;
+    --gold-soft: #d4b56a;
+    --gold-glow: rgba(201,168,76,.15);
+    --text:      #e8eaf0;
+    --text-2:    #8b95a8;
+    --text-3:    #5a6474;
+    --green:     #2dd98e;
+    --green-bg:  rgba(45,217,142,.1);
+    --red:       #f4636a;
+    --red-bg:    rgba(244,99,106,.1);
+    --blue:      #5b9ef6;
+    --blue-bg:   rgba(91,158,246,.1);
+    --amber:     #f5a742;
+    --amber-bg:  rgba(245,167,66,.1);
+    --sidebar-w: 230px;
+    --radius:    10px;
+    --shadow:    0 4px 24px rgba(0,0,0,.4);
+    --transition: .2s ease;
+  }
+
+  html { font-size: 15px; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* ─── SCROLLBAR ─────────────────────────────────────────────── */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  /* ─── LOGIN ─────────────────────────────────────────────────── */
+  #login-screen {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg);
+    z-index: 999;
+    transition: opacity .5s, visibility .5s;
+  }
+  #login-screen.hidden { opacity: 0; visibility: hidden; }
+
+  .login-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 60% at 10% 80%, rgba(201,168,76,.07) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 90% 20%, rgba(91,158,246,.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .login-grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: .25;
+    pointer-events: none;
+  }
+
+  .login-card {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 16px;
+    padding: 48px 44px;
+    width: 400px;
+    box-shadow: var(--shadow), 0 0 80px rgba(201,168,76,.06);
+    animation: fadeUp .6s ease both;
+  }
+
+  .login-logo {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+  .login-logo .brand-mark {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 60px; height: 60px;
+    background: linear-gradient(135deg, var(--gold), #a07830);
+    border-radius: 14px;
+    margin-bottom: 14px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px; font-weight: 700;
+    color: #fff;
+    letter-spacing: 1px;
+  }
+  .login-logo h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.7rem; font-weight: 600;
+    color: var(--text);
+    letter-spacing: .5px;
+  }
+  .login-logo p { color: var(--text-2); font-size: .82rem; margin-top: 4px; }
+
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-size: .78rem; font-weight: 500; color: var(--text-2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .6px; }
+  .field input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .93rem;
+    outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition);
+  }
+  .field input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px var(--gold-glow);
+  }
+
+  .btn-primary {
+    width: 100%; padding: 12px;
+    background: linear-gradient(135deg, var(--gold), #a07830);
+    border: none; border-radius: var(--radius);
+    color: #fff; font-family: 'DM Sans', sans-serif;
+    font-size: .93rem; font-weight: 600;
+    cursor: pointer;
+    transition: filter var(--transition), transform var(--transition);
+    margin-top: 8px;
+    letter-spacing: .3px;
+  }
+  .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+  .login-err {
+    background: var(--red-bg); border: 1px solid var(--red);
+    color: var(--red); border-radius: 8px;
+    padding: 9px 13px; font-size: .82rem;
+    margin-bottom: 14px; display: none;
+  }
+
+  /* ─── APP SHELL ──────────────────────────────────────────────── */
+  #app {
+    display: none;
+    min-height: 100vh;
+  }
+  #app.visible { display: flex; }
+
+  /* ─── SIDEBAR ────────────────────────────────────────────────── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    position: fixed; top: 0; left: 0; bottom: 0;
+    z-index: 100;
+    transition: transform var(--transition);
+  }
+
+  .sidebar-header {
+    padding: 22px 20px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-brand {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .sidebar-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--gold), #a07830);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+  }
+  .sidebar-name h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.05rem; font-weight: 600; color: var(--text);
+    line-height: 1.1;
+  }
+  .sidebar-name span { font-size: .7rem; color: var(--text-3); }
+
+  .sidebar-nav {
+    flex: 1; overflow-y: auto;
+    padding: 14px 10px;
+  }
+
+  .nav-section { margin-bottom: 22px; }
+  .nav-label {
+    font-size: .63rem; font-weight: 600; color: var(--text-3);
+    text-transform: uppercase; letter-spacing: 1px;
+    padding: 0 10px; margin-bottom: 6px;
+  }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px; border-radius: 8px;
+    cursor: pointer; font-size: .85rem; color: var(--text-2);
+    transition: background var(--transition), color var(--transition);
+    margin-bottom: 2px;
+    border: 1px solid transparent;
+    user-select: none;
+  }
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active {
+    background: var(--gold-glow); color: var(--gold);
+    border-color: rgba(201,168,76,.2);
+  }
+  .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+  .nav-badge {
+    margin-left: auto;
+    background: var(--red); color: #fff;
+    border-radius: 99px; padding: 1px 7px;
+    font-size: .65rem; font-weight: 700;
+    display: none;
+  }
+  .nav-badge.show { display: inline; }
+
+  .sidebar-footer {
+    padding: 14px 10px;
+    border-top: 1px solid var(--border);
+  }
+  .user-pill {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px; border-radius: 8px;
+    cursor: pointer;
+    transition: background var(--transition);
+  }
+  .user-pill:hover { background: var(--surface2); }
+  .user-av {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), #a07830);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .78rem; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+  }
+  .user-info { min-width: 0; flex: 1; }
+  .user-info strong { display: block; font-size: .83rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .user-info span { font-size: .7rem; color: var(--text-3); text-transform: capitalize; }
+  .btn-logout {
+    background: none; border: none; cursor: pointer;
+    color: var(--text-3); padding: 4px;
+    transition: color var(--transition);
+  }
+  .btn-logout:hover { color: var(--red); }
+
+  /* ─── MAIN ───────────────────────────────────────────────────── */
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    display: flex; flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    height: 58px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .topbar-title { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 600; }
+  .topbar-actions { display: flex; align-items: center; gap: 10px; }
+
+  .content { padding: 24px 28px; flex: 1; }
+
+  /* ─── PANELS ─────────────────────────────────────────────────── */
+  .panel { display: none; }
+  .panel.active { display: block; animation: fadeUp .3s ease both; }
+
+  /* ─── CARDS / STATS ──────────────────────────────────────────── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 16px; margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    position: relative; overflow: hidden;
+    transition: border-color var(--transition), transform var(--transition);
+  }
+  .stat-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+  .stat-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .stat-card.gold::before { background: var(--gold); }
+  .stat-card.green::before { background: var(--green); }
+  .stat-card.blue::before { background: var(--blue); }
+  .stat-card.red::before { background: var(--red); }
+  .stat-card.amber::before { background: var(--amber); }
+
+  .stat-label { font-size: .72rem; color: var(--text-3); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 10px; }
+  .stat-value { font-family: 'Cormorant Garamond', serif; font-size: 2.4rem; font-weight: 700; line-height: 1; color: var(--text); }
+  .stat-sub { font-size: .75rem; color: var(--text-2); margin-top: 8px; }
+
+  /* ─── TABLE ──────────────────────────────────────────────────── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .card-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .card-head h3 { font-size: .95rem; font-weight: 600; }
+  .card-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    padding: 11px 16px; text-align: left;
+    font-size: .72rem; font-weight: 600; color: var(--text-3);
+    text-transform: uppercase; letter-spacing: .6px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  tbody td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: .85rem; color: var(--text-2);
+    vertical-align: middle;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr { transition: background var(--transition); }
+  tbody tr:hover { background: var(--surface2); }
+
+  /* ─── BADGES / PILLS ─────────────────────────────────────────── */
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 99px;
+    font-size: .7rem; font-weight: 600; letter-spacing: .3px;
+    text-transform: capitalize; white-space: nowrap;
+  }
+  .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+  .badge.new     { background: var(--blue-bg);  color: var(--blue); }
+  .badge.qualified { background: var(--green-bg); color: var(--green); }
+  .badge.converted { background: var(--gold-glow); color: var(--gold); }
+  .badge.lost    { background: var(--red-bg);   color: var(--red); }
+  .badge.pending { background: var(--amber-bg); color: var(--amber); }
+  .badge.open    { background: var(--green-bg); color: var(--green); }
+  .badge.closed  { background: var(--surface3); color: var(--text-3); }
+  .badge.admin   { background: var(--gold-glow); color: var(--gold); }
+  .badge.agent   { background: var(--blue-bg);  color: var(--blue); }
+  .badge.active  { background: var(--green-bg); color: var(--green); }
+  .badge.sent    { background: var(--blue-bg);  color: var(--blue); }
+  .badge.draft   { background: var(--surface3); color: var(--text-3); }
+
+  /* ─── BUTTONS ────────────────────────────────────────────────── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: .82rem; font-weight: 500;
+    cursor: pointer; border: 1px solid transparent;
+    transition: all var(--transition);
+    white-space: nowrap;
+  }
+  .btn svg { width: 14px; height: 14px; }
+  .btn-gold {
+    background: linear-gradient(135deg, var(--gold), #a07830);
+    color: #fff; border-color: transparent;
+  }
+  .btn-gold:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .btn-outline {
+    background: transparent; color: var(--text-2);
+    border-color: var(--border2);
+  }
+  .btn-outline:hover { background: var(--surface2); color: var(--text); }
+  .btn-ghost {
+    background: transparent; color: var(--text-3); border-color: transparent;
+  }
+  .btn-ghost:hover { color: var(--text); background: var(--surface2); }
+  .btn-danger {
+    background: var(--red-bg); color: var(--red); border-color: var(--red);
+  }
+  .btn-danger:hover { background: var(--red); color: #fff; }
+  .btn-sm { padding: 5px 10px; font-size: .75rem; }
+
+  /* ─── SEARCH / FILTER ────────────────────────────────────────── */
+  .search-box {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 7px 12px;
+    min-width: 200px;
+    transition: border-color var(--transition);
+  }
+  .search-box:focus-within { border-color: var(--gold); }
+  .search-box svg { width: 14px; height: 14px; color: var(--text-3); flex-shrink: 0; }
+  .search-box input {
+    background: none; border: none; outline: none;
+    color: var(--text); font-family: 'DM Sans', sans-serif;
+    font-size: .83rem; width: 100%;
+  }
+  .search-box input::placeholder { color: var(--text-3); }
+
+  .select-filter {
+    background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: 8px; padding: 7px 12px;
+    color: var(--text); font-family: 'DM Sans', sans-serif;
+    font-size: .83rem; outline: none; cursor: pointer;
+    transition: border-color var(--transition);
+  }
+  .select-filter:focus { border-color: var(--gold); }
+
+  /* ─── PAGINATION ─────────────────────────────────────────────── */
+  .pagination {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    font-size: .8rem; color: var(--text-3);
+  }
+  .page-btns { display: flex; gap: 4px; }
+  .page-btn {
+    padding: 5px 10px; border-radius: 6px; cursor: pointer;
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text-2); font-size: .78rem;
+    transition: all var(--transition);
+  }
+  .page-btn.active { background: var(--gold-glow); color: var(--gold); border-color: rgba(201,168,76,.3); }
+  .page-btn:hover:not(.active) { background: var(--surface3); color: var(--text); }
+
+  /* ─── MODAL ──────────────────────────────────────────────────── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.6); backdrop-filter: blur(4px);
+    z-index: 200;
+    display: none; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; animation: fadeIn .2s ease both; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 14px;
+    width: 100%; max-width: 520px;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: var(--shadow);
+    animation: fadeUp .25s ease both;
+  }
+  .modal-head {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .modal-head h3 { font-size: 1rem; font-weight: 600; }
+  .modal-body { padding: 24px; }
+  .modal-foot {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: flex-end; gap: 8px;
+  }
+  .modal-close {
+    background: none; border: none; cursor: pointer;
+    color: var(--text-3); transition: color var(--transition);
+    padding: 4px;
+  }
+  .modal-close:hover { color: var(--text); }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: .75rem; font-weight: 500; color: var(--text-2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .5px; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: 8px; padding: 9px 12px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: .88rem; outline: none;
+    transition: border-color var(--transition);
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--gold); }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+  .form-group select option { background: var(--surface2); }
+
+  /* ─── INBOX ──────────────────────────────────────────────────── */
+  .inbox-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    height: calc(100vh - 58px - 48px);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .conv-list {
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+  }
+  .conv-list-head {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: .85rem; font-weight: 600;
+  }
+  .conv-items { flex: 1; overflow-y: auto; }
+  .conv-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 13px 16px;
+    cursor: pointer; border-bottom: 1px solid var(--border);
+    transition: background var(--transition);
+  }
+  .conv-item:hover, .conv-item.active { background: var(--surface2); }
+  .conv-av {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    background: var(--surface3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .78rem; font-weight: 600; color: var(--text-2);
+  }
+  .conv-info { flex: 1; min-width: 0; }
+  .conv-name { font-size: .85rem; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .conv-preview { font-size: .75rem; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+  .conv-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .conv-time { font-size: .68rem; color: var(--text-3); }
+  .unread-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+
+  .chat-area {
+    display: flex; flex-direction: column;
+    background: var(--bg);
+  }
+  .chat-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .chat-messages {
+    flex: 1; overflow-y: auto;
+    padding: 20px 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .msg {
+    max-width: 70%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: .85rem; line-height: 1.5;
+  }
+  .msg.in {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    align-self: flex-start;
+    border-bottom-left-radius: 3px;
+  }
+  .msg.out {
+    background: linear-gradient(135deg, #1a6b3c, #0e5230);
+    color: #d1f0df;
+    align-self: flex-end;
+    border-bottom-right-radius: 3px;
+  }
+  .msg-time { font-size: .65rem; color: var(--text-3); margin-top: 4px; }
+  .msg.out .msg-time { color: rgba(255,255,255,.4); text-align: right; }
+
+  .chat-input-area {
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    display: flex; gap: 10px; align-items: flex-end;
+  }
+  .chat-input {
+    flex: 1;
+    background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: 10px; padding: 10px 14px;
+    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: .88rem;
+    outline: none; resize: none; max-height: 120px;
+    transition: border-color var(--transition);
+  }
+  .chat-input:focus { border-color: var(--gold); }
+  .empty-chat {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 12px; color: var(--text-3);
+  }
+  .empty-chat svg { width: 48px; height: 48px; opacity: .3; }
+
+  /* ─── EMPTY STATE ────────────────────────────────────────────── */
+  .empty-state {
+    padding: 50px 20px; text-align: center; color: var(--text-3);
+  }
+  .empty-state svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: .3; }
+  .empty-state p { font-size: .88rem; }
+
+  /* ─── TOAST ──────────────────────────────────────────────────── */
+  #toast-container {
+    position: fixed; bottom: 24px; right: 24px;
+    display: flex; flex-direction: column; gap: 8px; z-index: 999;
+  }
+  .toast {
+    background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: 10px; padding: 12px 16px;
+    font-size: .83rem; color: var(--text);
+    box-shadow: var(--shadow);
+    display: flex; align-items: center; gap: 10px;
+    animation: slideUp .25s ease both;
+    min-width: 220px;
+  }
+  .toast.success { border-left: 3px solid var(--green); }
+  .toast.error   { border-left: 3px solid var(--red); }
+  .toast.info    { border-left: 3px solid var(--blue); }
+
+  /* ─── LOADER ─────────────────────────────────────────────────── */
+  .loader {
+    display: inline-block; width: 18px; height: 18px;
+    border: 2px solid var(--border2);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+  .loading-row td { text-align: center; padding: 30px; }
+
+  /* ─── ACTIVITY FEED ──────────────────────────────────────────── */
+  .activity-feed { padding: 4px 0; }
+  .activity-item {
+    display: flex; gap: 12px; padding: 10px 20px;
+    border-bottom: 1px solid var(--border); font-size: .82rem;
+  }
+  .activity-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gold); margin-top: 5px; flex-shrink: 0;
+  }
+  .activity-text { color: var(--text-2); }
+  .activity-time { color: var(--text-3); font-size: .72rem; margin-top: 2px; }
+
+  /* ─── ANIMATIONS ─────────────────────────────────────────────── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; } to { opacity: 1; }
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ─── RESPONSIVE ─────────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    :root { --sidebar-w: 60px; }
+    .sidebar-name, .nav-label, .nav-item span, .user-info { display: none; }
+    .nav-item { justify-content: center; padding: 10px; }
+    .sidebar-header { padding: 14px 10px; }
+    .sidebar-icon { margin: 0 auto; }
+    .content { padding: 16px; }
+    .topbar { padding: 0 16px; }
+    .inbox-layout { grid-template-columns: 1fr; }
+    .conv-list { display: none; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ LOGIN ═══════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-bg"></div>
+  <div class="login-grid"></div>
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="brand-mark">3L</div>
+      <h1>3LG Turismo</h1>
+      <p>CRM & Marketing — v10.1</p>
+    </div>
+    <div class="login-err" id="login-err">E-mail ou senha inválidos.</div>
+    <div class="field">
+      <label>E-mail</label>
+      <input type="email" id="login-email" placeholder="seu@email.com.br" value="admin@3lgturismo.com.br" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>Senha</label>
+      <input type="password" id="login-pass" placeholder="••••••••" value="3LG@2026" autocomplete="current-password">
+    </div>
+    <button class="btn-primary" id="login-btn" onclick="doLogin()">Entrar</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ APP ═══════════════════════════════ -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <div class="sidebar-icon">3L</div>
+        <div class="sidebar-name">
+          <h2>3LG Turismo</h2>
+          <span>CRM v10.1</span>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-label">Principal</div>
+        <div class="nav-item active" data-panel="dashboard" onclick="showPanel('dashboard')">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <span>Dashboard</span>
+        </div>
+        <div class="nav-item" data-panel="leads" onclick="showPanel('leads')">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Leads</span>
+        </div>
+        <div class="nav-item" data-panel="inbox" onclick="showPanel('inbox')">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Inbox WhatsApp</span>
+          <span class="nav-badge" id="badge-inbox">0</span>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Comercial</div>
+        <div class="nav-item" data-panel="quotes" onclick="showPanel('quotes')">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span>Cotações</span>
+        </div>
+        <div class="nav-item" data-panel="campaigns" onclick="showPanel('campaigns')">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          <span>Campanhas</span>
+        </div>
+      </div>
+      <div class="nav-section" id="admin-section">
+        <div class="nav-label">Administração</div>
+        <div class="nav-item" data-panel="users" onclick="showPanel('users')">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Usuários</span>
+        </div>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-pill">
+        <div class="user-av" id="user-av">A</div>
+        <div class="user-info">
+          <strong id="user-name">Carregando...</strong>
+          <span id="user-role">admin</span>
+        </div>
+        <button class="btn-logout" title="Sair" onclick="doLogout()">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <h2 class="topbar-title" id="topbar-title">Dashboard</h2>
+      <div class="topbar-actions" id="topbar-actions"></div>
+    </header>
+
+    <div class="content">
+
+      <!-- ════ DASHBOARD ════ -->
+      <div class="panel active" id="panel-dashboard">
+        <div class="stats-grid" id="stats-grid">
+          <div class="stat-card gold">
+            <div class="stat-label">Total de Leads</div>
+            <div class="stat-value" id="st-leads">—</div>
+            <div class="stat-sub">Cadastros no sistema</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-label">Conversas Abertas</div>
+            <div class="stat-value" id="st-conv">—</div>
+            <div class="stat-sub">WhatsApp ativo</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-label">Qualificados</div>
+            <div class="stat-value" id="st-qual">—</div>
+            <div class="stat-sub">Bot concluído</div>
+          </div>
+          <div class="stat-card amber">
+            <div class="stat-label">Convertidos</div>
+            <div class="stat-value" id="st-conv2">—</div>
+            <div class="stat-sub">Venda realizada</div>
+          </div>
+          <div class="stat-card red">
+            <div class="stat-label">Perdidos</div>
+            <div class="stat-value" id="st-lost">—</div>
+            <div class="stat-sub">Não convertidos</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="card">
+            <div class="card-head"><h3>Leads Recentes</h3></div>
+            <table id="dash-leads-tbl">
+              <thead><tr><th>Nome</th><th>Status</th><th>Criado</th></tr></thead>
+              <tbody id="dash-leads-body"><tr class="loading-row"><td colspan="3"><div class="loader"></div></td></tr></tbody>
+            </table>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Atividade Recente</h3></div>
+            <div class="activity-feed" id="activity-feed">
+              <div class="empty-state"><p>Carregando...</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ LEADS ════ -->
+      <div class="panel" id="panel-leads">
+        <div class="card">
+          <div class="card-head">
+            <h3>Leads</h3>
+            <div class="card-actions">
+              <div class="search-box">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="leads-search" placeholder="Buscar lead..." oninput="debounce(loadLeads,400)()">
+              </div>
+              <select class="select-filter" id="leads-status" onchange="loadLeads()">
+                <option value="">Todos status</option>
+                <option value="new">Novo</option>
+                <option value="qualified">Qualificado</option>
+                <option value="converted">Convertido</option>
+                <option value="lost">Perdido</option>
+              </select>
+              <button class="btn btn-gold" onclick="openLeadModal()">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Novo Lead
+              </button>
+            </div>
+          </div>
+          <table>
+            <thead><tr><th>Nome</th><th>Telefone</th><th>E-mail</th><th>Status</th><th>Criado em</th><th></th></tr></thead>
+            <tbody id="leads-body"><tr class="loading-row"><td colspan="6"><div class="loader"></div></td></tr></tbody>
+          </table>
+          <div class="pagination">
+            <span id="leads-info">—</span>
+            <div class="page-btns" id="leads-pages"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ INBOX ════ -->
+      <div class="panel" id="panel-inbox">
+        <div class="inbox-layout">
+          <div class="conv-list">
+            <div class="conv-list-head">Conversas</div>
+            <div class="conv-items" id="conv-items">
+              <div class="empty-state"><p>Carregando...</p></div>
+            </div>
+          </div>
+          <div class="chat-area" id="chat-area">
+            <div class="empty-chat">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span>Selecione uma conversa</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ COTAÇÕES ════ -->
+      <div class="panel" id="panel-quotes">
+        <div class="card">
+          <div class="card-head">
+            <h3>Cotações</h3>
+            <div class="card-actions">
+              <button class="btn btn-gold" onclick="openQuoteModal()">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Nova Cotação
+              </button>
+            </div>
+          </div>
+          <table>
+            <thead><tr><th>Lead</th><th>Destino</th><th>Valor (R$)</th><th>Status</th><th>Criado em</th><th></th></tr></thead>
+            <tbody id="quotes-body"><tr class="loading-row"><td colspan="6"><div class="loader"></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ════ CAMPANHAS ════ -->
+      <div class="panel" id="panel-campaigns">
+        <div class="card">
+          <div class="card-head">
+            <h3>Campanhas de Marketing</h3>
+            <div class="card-actions">
+              <button class="btn btn-gold" onclick="openCampaignModal()">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Nova Campanha
+              </button>
+            </div>
+          </div>
+          <table>
+            <thead><tr><th>Nome</th><th>Filtro de Status</th><th>Agendamento</th><th>Status</th><th>Criado em</th><th></th></tr></thead>
+            <tbody id="campaigns-body"><tr class="loading-row"><td colspan="6"><div class="loader"></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ════ USUÁRIOS ════ -->
+      <div class="panel" id="panel-users">
+        <div class="card">
+          <div class="card-head">
+            <h3>Usuários do Sistema</h3>
+            <div class="card-actions">
+              <button class="btn btn-gold" onclick="openUserModal()">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Novo Usuário
+              </button>
+            </div>
+          </div>
+          <table>
+            <thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Criado em</th><th></th></tr></thead>
+            <tbody id="users-body"><tr class="loading-row"><td colspan="5"><div class="loader"></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ═══════════════════════════ MODALS ═══════════════════════════ -->
+
+<!-- Lead Modal -->
+<div class="modal-overlay" id="modal-lead">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modal-lead-title">Novo Lead</h3>
+      <button class="modal-close" onclick="closeModal('modal-lead')">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>Nome *</label><input type="text" id="lead-name" placeholder="Nome completo"></div>
+        <div class="form-group"><label>Telefone *</label><input type="text" id="lead-phone" placeholder="5511999999999"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>E-mail</label><input type="email" id="lead-email" placeholder="email@exemplo.com"></div>
+        <div class="form-group"><label>Status</label>
+          <select id="lead-status">
+            <option value="new">Novo</option>
+            <option value="qualified">Qualificado</option>
+            <option value="converted">Convertido</option>
+            <option value="lost">Perdido</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>Observações</label><textarea id="lead-notes" placeholder="Anotações sobre o lead..."></textarea></div>
+      <input type="hidden" id="lead-id">
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('modal-lead')">Cancelar</button>
+      <button class="btn btn-gold" onclick="saveLead()">Salvar Lead</button>
+    </div>
+  </div>
+</div>
+
+<!-- Quote Modal -->
+<div class="modal-overlay" id="modal-quote">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Nova Cotação</h3>
+      <button class="modal-close" onclick="closeModal('modal-quote')">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label>Lead *</label><select id="quote-lead"><option value="">Selecione o lead...</option></select></div>
+      <div class="form-row">
+        <div class="form-group"><label>Destino *</label><input type="text" id="quote-dest" placeholder="Ex: Cancún, México"></div>
+        <div class="form-group"><label>Valor (R$) *</label><input type="number" id="quote-value" placeholder="0.00"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Data de Saída</label><input type="date" id="quote-dep"></div>
+        <div class="form-group"><label>Data de Volta</label><input type="date" id="quote-ret"></div>
+      </div>
+      <div class="form-group"><label>Detalhes / Proposta</label><textarea id="quote-details" placeholder="Inclua detalhes do pacote, hotel, traslados..." rows="4"></textarea></div>
+      <input type="hidden" id="quote-id">
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('modal-quote')">Cancelar</button>
+      <button class="btn btn-gold" onclick="saveQuote()">Salvar Cotação</button>
+    </div>
+  </div>
+</div>
+
+<!-- Campaign Modal -->
+<div class="modal-overlay" id="modal-campaign">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Nova Campanha</h3>
+      <button class="modal-close" onclick="closeModal('modal-campaign')">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label>Nome da Campanha *</label><input type="text" id="camp-name" placeholder="Black Friday 2026..."></div>
+      <div class="form-group"><label>Filtro de Público</label>
+        <select id="camp-filter">
+          <option value="">Todos os leads</option>
+          <option value="new">Apenas novos</option>
+          <option value="qualified">Apenas qualificados</option>
+          <option value="converted">Apenas convertidos</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Mensagem *</label><textarea id="camp-msg" placeholder="Olá {nome}! Temos uma oferta especial para você..." rows="4"></textarea></div>
+      <div class="form-group"><label>Agendamento (opcional)</label><input type="datetime-local" id="camp-schedule"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('modal-campaign')">Cancelar</button>
+      <button class="btn btn-gold" onclick="saveCampaign()">Salvar Campanha</button>
+    </div>
+  </div>
+</div>
+
+<!-- User Modal -->
+<div class="modal-overlay" id="modal-user">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Novo Usuário</h3>
+      <button class="modal-close" onclick="closeModal('modal-user')">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>Nome *</label><input type="text" id="user-name-input" placeholder="Nome completo"></div>
+        <div class="form-group"><label>E-mail *</label><input type="email" id="user-email-input" placeholder="agente@turismo.com"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Senha *</label><input type="password" id="user-pass-input" placeholder="Mínimo 6 caracteres"></div>
+        <div class="form-group"><label>Perfil</label>
+          <select id="user-role-input">
+            <option value="agent">Agente</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('modal-user')">Cancelar</button>
+      <button class="btn btn-gold" onclick="saveUser()">Criar Usuário</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════
+
+// ▼▼▼ CONFIGURE AQUI a URL do seu backend ▼▼▼
+// Deixe '' se o index.html for servido pelo próprio Node.js (mesmo domínio/porta).
+// Coloque a URL completa se for separado, ex: 'https://meu-crm.railway.app'
+const API_BASE = '';
+// ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
+let TOKEN = localStorage.getItem('3lg_token') || '';
+let CURRENT_USER = null;
+let leadsPage = 1;
+let activeConvId = null;
+let inboxPollTimer = null;
+let chatPollTimer  = null;
+
+// ═══════════════════════════════════════════════════════════════
+//  API HELPER
+// ═══════════════════════════════════════════════════════════════
+async function safeJson(res) {
+  const ct = res.headers.get('content-type') || '';
+  if (!ct.includes('application/json')) {
+    // O servidor retornou HTML (404, página de erro, etc.) em vez de JSON.
+    const text = await res.text().catch(() => '');
+    const hint = text.startsWith('<!') 
+      ? 'O servidor retornou uma página HTML. Verifique se a URL do backend está correta e se o servidor está rodando.'
+      : (text.slice(0, 120) || `HTTP ${res.status}`);
+    throw new Error(hint);
+  }
+  return res.json();
+}
+
+async function api(method, path, body) {
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  let res;
+  try {
+    res = await fetch(API_BASE + path, opts);
+  } catch (e) {
+    throw new Error('Não foi possível conectar ao servidor. Verifique se o backend está rodando e a URL está correta.');
+  }
+  if (res.status === 401) { doLogout(); return null; }
+  const data = await safeJson(res).catch(e => { throw e; });
+  if (!res.ok) throw new Error(data.error || data.message || `Erro ${res.status}`);
+  return data;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  AUTH
+// ═══════════════════════════════════════════════════════════════
+async function doLogin() {
+  const btn   = document.getElementById('login-btn');
+  const err   = document.getElementById('login-err');
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  err.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Entrando...';
+  try {
+    let res;
+    try {
+      res = await fetch(API_BASE + '/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: pass })
+      });
+    } catch (e) {
+      throw new Error('Servidor inacessível. Verifique se o backend está rodando.');
+    }
+    const data = await safeJson(res);
+    if (!res.ok) throw new Error(data.error || data.message || 'Credenciais inválidas');
+    TOKEN = data.token;
+    CURRENT_USER = data.user;
+    localStorage.setItem('3lg_token', TOKEN);
+    bootApp();
+  } catch (e) {
+    err.textContent = e.message || 'E-mail ou senha inválidos.';
+    err.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Entrar';
+  }
+}
+
+function doLogout() {
+  localStorage.removeItem('3lg_token');
+  TOKEN = '';
+  CURRENT_USER = null;
+  clearInterval(inboxPollTimer);
+  clearInterval(chatPollTimer);
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('login-screen').classList.remove('hidden');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════════════════════
+async function bootApp() {
+  // Try fetching user if we have token but no user obj
+  if (TOKEN && !CURRENT_USER) {
+    try {
+      // decode JWT payload
+      const payload = JSON.parse(atob(TOKEN.split('.')[1]));
+      CURRENT_USER = { id: payload.id, name: payload.name || payload.email, role: payload.role };
+    } catch {}
+  }
+  if (!TOKEN) return;
+
+  // Hide login, show app
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app').classList.add('visible');
+
+  // Set user UI
+  if (CURRENT_USER) {
+    document.getElementById('user-name').textContent = CURRENT_USER.name || CURRENT_USER.email || 'Usuário';
+    document.getElementById('user-role').textContent = CURRENT_USER.role || 'agent';
+    document.getElementById('user-av').textContent = (CURRENT_USER.name || 'U')[0].toUpperCase();
+    // Hide admin section for non-admins
+    if (CURRENT_USER.role !== 'admin') {
+      document.getElementById('admin-section').style.display = 'none';
+    }
+  }
+
+  showPanel('dashboard');
+  startInboxPolling();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+const panelTitles = {
+  dashboard: 'Dashboard',
+  leads:     'Gestão de Leads',
+  inbox:     'Inbox WhatsApp',
+  quotes:    'Cotações',
+  campaigns: 'Campanhas de Marketing',
+  users:     'Usuários do Sistema',
+};
+
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  document.querySelector(`.nav-item[data-panel="${name}"]`)?.classList.add('active');
+  document.getElementById('topbar-title').textContent = panelTitles[name] || name;
+
+  const loaders = {
+    dashboard: loadDashboard,
+    leads:     loadLeads,
+    inbox:     loadConversations,
+    quotes:    loadQuotes,
+    campaigns: loadCampaigns,
+    users:     loadUsers,
+  };
+  if (loaders[name]) loaders[name]();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  DASHBOARD
+// ═══════════════════════════════════════════════════════════════
+async function loadDashboard() {
+  try {
+    const data = await api('GET', '/api/dashboard');
+    if (!data) return;
+
+    const s = data.stats || data;
+    document.getElementById('st-leads').textContent = s.total_leads ?? s.leads ?? '—';
+    document.getElementById('st-conv').textContent  = s.open_conversations ?? s.conversations ?? '—';
+    document.getElementById('st-qual').textContent  = s.qualified_leads ?? s.qualified ?? '—';
+    document.getElementById('st-conv2').textContent = s.converted_leads ?? s.converted ?? '—';
+    document.getElementById('st-lost').textContent  = s.lost_leads ?? s.lost ?? '—';
+
+    // Recent leads
+    const leads = data.recent_leads || [];
+    const tbody = document.getElementById('dash-leads-body');
+    if (!leads.length) {
+      tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--text-3);padding:20px">Nenhum lead ainda</td></tr>';
+    } else {
+      tbody.innerHTML = leads.map(l => `
+        <tr>
+          <td style="color:var(--text)">${esc(l.name)}</td>
+          <td><span class="badge ${l.status}">${statusLabel(l.status)}</span></td>
+          <td>${fmtDate(l.created_at)}</td>
+        </tr>`).join('');
+    }
+
+    // Activity
+    const acts = data.recent_activities || data.activities || [];
+    const feed = document.getElementById('activity-feed');
+    if (!acts.length) {
+      feed.innerHTML = '<div class="empty-state"><p>Nenhuma atividade ainda</p></div>';
+    } else {
+      feed.innerHTML = acts.map(a => `
+        <div class="activity-item">
+          <div class="activity-dot"></div>
+          <div>
+            <div class="activity-text">${esc(a.description || a.action)}</div>
+            <div class="activity-time">${fmtDate(a.created_at)}</div>
+          </div>
+        </div>`).join('');
+    }
+  } catch (e) {
+    toast('Erro ao carregar dashboard: ' + e.message, 'error');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  LEADS
+// ═══════════════════════════════════════════════════════════════
+async function loadLeads() {
+  const search = document.getElementById('leads-search').value;
+  const status = document.getElementById('leads-status').value;
+  const tbody  = document.getElementById('leads-body');
+  tbody.innerHTML = '<tr class="loading-row"><td colspan="6"><div class="loader"></div></td></tr>';
+  try {
+    const params = new URLSearchParams({ page: leadsPage });
+    if (search) params.set('search', search);
+    if (status) params.set('status', status);
+    const data = await api('GET', `/api/leads?${params}`);
+    if (!data) return;
+
+    const leads = data.leads || data.data || data;
+    if (!leads.length) {
+      tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>Nenhum lead encontrado</p></div></td></tr>';
+    } else {
+      tbody.innerHTML = leads.map(l => `
+        <tr>
+          <td style="color:var(--text);font-weight:500">${esc(l.name)}</td>
+          <td style="font-family:'DM Mono',monospace;font-size:.78rem">${esc(l.phone || '—')}</td>
+          <td>${esc(l.email || '—')}</td>
+          <td><span class="badge ${l.status}">${statusLabel(l.status)}</span></td>
+          <td>${fmtDate(l.created_at)}</td>
+          <td>
+            <div style="display:flex;gap:4px">
+              <button class="btn btn-ghost btn-sm" onclick='openLeadModal(${JSON.stringify(l)})' title="Editar">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+              ${CURRENT_USER?.role === 'admin' ? `<button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="deleteLead(${l.id})" title="Excluir">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+              </button>` : ''}
+            </div>
+          </td>
+        </tr>`).join('');
+    }
+
+    // Pagination
+    const total = data.total ?? leads.length;
+    const limit = data.limit ?? 20;
+    const pages = Math.ceil(total / limit);
+    document.getElementById('leads-info').textContent = `${total} lead${total !== 1 ? 's' : ''}`;
+    const pc = document.getElementById('leads-pages');
+    pc.innerHTML = '';
+    for (let i = 1; i <= Math.min(pages, 8); i++) {
+      const b = document.createElement('div');
+      b.className = 'page-btn' + (i === leadsPage ? ' active' : '');
+      b.textContent = i;
+      b.onclick = () => { leadsPage = i; loadLeads(); };
+      pc.appendChild(b);
+    }
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--red);padding:20px">${e.message}</td></tr>`;
+  }
+}
+
+function openLeadModal(lead) {
+  document.getElementById('lead-id').value    = lead?.id || '';
+  document.getElementById('lead-name').value  = lead?.name || '';
+  document.getElementById('lead-phone').value = lead?.phone || '';
+  document.getElementById('lead-email').value = lead?.email || '';
+  document.getElementById('lead-status').value= lead?.status || 'new';
+  document.getElementById('lead-notes').value = lead?.notes || '';
+  document.getElementById('modal-lead-title').textContent = lead ? 'Editar Lead' : 'Novo Lead';
+  openModal('modal-lead');
+}
+
+async function saveLead() {
+  const id    = document.getElementById('lead-id').value;
+  const name  = document.getElementById('lead-name').value.trim();
+  const phone = document.getElementById('lead-phone').value.trim();
+  if (!name || !phone) return toast('Nome e telefone são obrigatórios', 'error');
+  const body = {
+    name, phone,
+    email:  document.getElementById('lead-email').value.trim(),
+    status: document.getElementById('lead-status').value,
+    notes:  document.getElementById('lead-notes').value.trim(),
+  };
+  try {
+    if (id) await api('PUT', `/api/leads/${id}`, body);
+    else    await api('POST', '/api/leads', body);
+    closeModal('modal-lead');
+    toast(id ? 'Lead atualizado!' : 'Lead criado!', 'success');
+    loadLeads();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function deleteLead(id) {
+  if (!confirm('Excluir este lead? Esta ação não pode ser desfeita.')) return;
+  try {
+    await api('DELETE', `/api/leads/${id}`);
+    toast('Lead excluído.', 'success');
+    loadLeads();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INBOX / CHAT
+// ═══════════════════════════════════════════════════════════════
+async function loadConversations() {
+  try {
+    const data = await api('GET', '/api/conversations');
+    const convs = data?.conversations || data || [];
+    const el    = document.getElementById('conv-items');
+    if (!convs.length) {
+      el.innerHTML = '<div class="empty-state"><p>Nenhuma conversa</p></div>';
+      return;
+    }
+    el.innerHTML = convs.map(c => `
+      <div class="conv-item${c.id === activeConvId ? ' active' : ''}" onclick="openConv(${c.id},'${esc(c.lead_name||c.channel_id)}')">
+        <div class="conv-av">${(c.lead_name||'?')[0].toUpperCase()}</div>
+        <div class="conv-info">
+          <div class="conv-name">${esc(c.lead_name || c.channel_id || 'Desconhecido')}</div>
+          <div class="conv-preview">${esc(c.last_message || 'Sem mensagens')}</div>
+        </div>
+        <div class="conv-meta">
+          <span class="conv-time">${fmtTime(c.updated_at || c.created_at)}</span>
+          <span class="badge ${c.status}" style="font-size:.6rem;padding:2px 7px">${c.status === 'open' ? 'Aberta' : 'Fechada'}</span>
+        </div>
+      </div>`).join('');
+
+    // badge
+    const open = convs.filter(c => c.status === 'open').length;
+    const badge = document.getElementById('badge-inbox');
+    badge.textContent = open;
+    badge.classList.toggle('show', open > 0);
+  } catch (e) {
+    toast('Erro ao carregar conversas', 'error');
+  }
+}
+
+async function openConv(id, name) {
+  activeConvId = id;
+  clearInterval(chatPollTimer);
+  const area = document.getElementById('chat-area');
+  area.innerHTML = `
+    <div class="chat-header">
+      <div>
+        <div style="font-weight:600">${esc(name)}</div>
+        <div style="font-size:.75rem;color:var(--text-3)">WhatsApp</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-outline btn-sm" onclick="closeConv(${id})">Fechar conversa</button>
+      </div>
+    </div>
+    <div class="chat-messages" id="chat-msgs"></div>
+    <div class="chat-input-area">
+      <textarea class="chat-input" id="chat-input" rows="1" placeholder="Digite sua mensagem..." onkeydown="chatEnter(event,${id})"></textarea>
+      <button class="btn btn-gold btn-sm" onclick="sendMsg(${id})">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Enviar
+      </button>
+    </div>`;
+  loadConversations(); // refresh list to mark active
+  await loadMessages(id);
+  chatPollTimer = setInterval(() => loadMessages(id), 5000);
+}
+
+async function loadMessages(convId) {
+  try {
+    const data = await api('GET', `/api/conversations/${convId}/messages`);
+    const msgs = data?.messages || data || [];
+    const el   = document.getElementById('chat-msgs');
+    if (!el) return;
+    el.innerHTML = msgs.map(m => `
+      <div>
+        <div class="msg ${m.direction === 'outbound' ? 'out' : 'in'}">${esc(m.content)}</div>
+        <div class="msg-time ${m.direction === 'outbound' ? 'out' : ''}">${fmtTime(m.created_at)}</div>
+      </div>`).join('');
+    el.scrollTop = el.scrollHeight;
+  } catch {}
+}
+
+function chatEnter(e, id) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(id); }
+}
+
+async function sendMsg(id) {
+  const inp = document.getElementById('chat-input');
+  const msg = inp?.value.trim();
+  if (!msg) return;
+  inp.value = '';
+  try {
+    await api('POST', `/api/conversations/${id}/messages`, { content: msg });
+    loadMessages(id);
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function closeConv(id) {
+  try {
+    await api('PUT', `/api/conversations/${id}/status`, { status: 'closed' });
+    toast('Conversa fechada', 'success');
+    clearInterval(chatPollTimer);
+    activeConvId = null;
+    document.getElementById('chat-area').innerHTML = `
+      <div class="empty-chat">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Selecione uma conversa</span>
+      </div>`;
+    loadConversations();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+function startInboxPolling() {
+  loadConversations();
+  inboxPollTimer = setInterval(loadConversations, 15000);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  QUOTES
+// ═══════════════════════════════════════════════════════════════
+async function loadQuotes() {
+  const tbody = document.getElementById('quotes-body');
+  tbody.innerHTML = '<tr class="loading-row"><td colspan="6"><div class="loader"></div></td></tr>';
+  try {
+    const data = await api('GET', '/api/quotes');
+    const quotes = data?.quotes || data || [];
+    if (!quotes.length) {
+      tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>Nenhuma cotação ainda</p></div></td></tr>';
+    } else {
+      tbody.innerHTML = quotes.map(q => `
+        <tr>
+          <td style="color:var(--text)">${esc(q.lead_name || '#' + q.lead_id)}</td>
+          <td>${esc(q.destination || '—')}</td>
+          <td style="font-weight:500;color:var(--text)">R$ ${Number(q.value||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
+          <td><span class="badge ${q.status || 'draft'}">${q.status || 'rascunho'}</span></td>
+          <td>${fmtDate(q.created_at)}</td>
+          <td>
+            <div style="display:flex;gap:4px">
+              <button class="btn btn-outline btn-sm" onclick="sendQuote(${q.id})" title="Enviar via WhatsApp">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                Enviar
+              </button>
+            </div>
+          </td>
+        </tr>`).join('');
+    }
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--red);padding:20px">${e.message}</td></tr>`;
+  }
+}
+
+async function openQuoteModal() {
+  // Load leads for select
+  try {
+    const data = await api('GET', '/api/leads?limit=100');
+    const leads = data?.leads || data?.data || data || [];
+    const sel = document.getElementById('quote-lead');
+    sel.innerHTML = '<option value="">Selecione o lead...</option>' +
+      leads.map(l => `<option value="${l.id}">${esc(l.name)} — ${esc(l.phone||'')}</option>`).join('');
+  } catch {}
+  document.getElementById('quote-id').value = '';
+  document.getElementById('quote-dest').value = '';
+  document.getElementById('quote-value').value = '';
+  document.getElementById('quote-dep').value = '';
+  document.getElementById('quote-ret').value = '';
+  document.getElementById('quote-details').value = '';
+  openModal('modal-quote');
+}
+
+async function saveQuote() {
+  const body = {
+    lead_id:     document.getElementById('quote-lead').value,
+    destination: document.getElementById('quote-dest').value.trim(),
+    value:       document.getElementById('quote-value').value,
+    departure:   document.getElementById('quote-dep').value,
+    return_date: document.getElementById('quote-ret').value,
+    details:     document.getElementById('quote-details').value.trim(),
+  };
+  if (!body.lead_id || !body.destination) return toast('Lead e destino são obrigatórios', 'error');
+  try {
+    const id = document.getElementById('quote-id').value;
+    if (id) await api('PUT', `/api/quotes/${id}`, body);
+    else    await api('POST', '/api/quotes', body);
+    closeModal('modal-quote');
+    toast('Cotação salva!', 'success');
+    loadQuotes();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function sendQuote(id) {
+  if (!confirm('Enviar esta cotação pelo WhatsApp?')) return;
+  try {
+    await api('POST', `/api/quotes/${id}/send`);
+    toast('Cotação enviada pelo WhatsApp!', 'success');
+    loadQuotes();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  CAMPAIGNS
+// ═══════════════════════════════════════════════════════════════
+async function loadCampaigns() {
+  const tbody = document.getElementById('campaigns-body');
+  tbody.innerHTML = '<tr class="loading-row"><td colspan="6"><div class="loader"></div></td></tr>';
+  try {
+    const data = await api('GET', '/api/campaigns');
+    const camps = data?.campaigns || data || [];
+    if (!camps.length) {
+      tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>Nenhuma campanha ainda</p></div></td></tr>';
+    } else {
+      tbody.innerHTML = camps.map(c => `
+        <tr>
+          <td style="color:var(--text);font-weight:500">${esc(c.name)}</td>
+          <td>${c.filter_status ? `<span class="badge ${c.filter_status}">${statusLabel(c.filter_status)}</span>` : '<span style="color:var(--text-3)">Todos</span>'}</td>
+          <td style="font-size:.8rem">${c.scheduled_at ? fmtDate(c.scheduled_at) : '<span style="color:var(--text-3)">Manual</span>'}</td>
+          <td><span class="badge ${c.status || 'draft'}">${c.status || 'rascunho'}</span></td>
+          <td>${fmtDate(c.created_at)}</td>
+          <td>
+            ${CURRENT_USER?.role === 'admin' ? `
+            <button class="btn btn-outline btn-sm" onclick="fireCampaign(${c.id})" title="Disparar agora">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              Disparar
+            </button>` : ''}
+          </td>
+        </tr>`).join('');
+    }
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--red);padding:20px">${e.message}</td></tr>`;
+  }
+}
+
+function openCampaignModal() {
+  document.getElementById('camp-name').value     = '';
+  document.getElementById('camp-filter').value   = '';
+  document.getElementById('camp-msg').value      = '';
+  document.getElementById('camp-schedule').value = '';
+  openModal('modal-campaign');
+}
+
+async function saveCampaign() {
+  const body = {
+    name:           document.getElementById('camp-name').value.trim(),
+    filter_status:  document.getElementById('camp-filter').value,
+    message:        document.getElementById('camp-msg').value.trim(),
+    scheduled_at:   document.getElementById('camp-schedule').value || null,
+  };
+  if (!body.name || !body.message) return toast('Nome e mensagem são obrigatórios', 'error');
+  try {
+    await api('POST', '/api/campaigns', body);
+    closeModal('modal-campaign');
+    toast('Campanha criada!', 'success');
+    loadCampaigns();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function fireCampaign(id) {
+  if (!confirm('Disparar esta campanha agora para todos os leads selecionados?')) return;
+  try {
+    await api('POST', `/api/campaigns/${id}/fire`);
+    toast('Campanha disparada!', 'success');
+    loadCampaigns();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  USERS
+// ═══════════════════════════════════════════════════════════════
+async function loadUsers() {
+  const tbody = document.getElementById('users-body');
+  tbody.innerHTML = '<tr class="loading-row"><td colspan="5"><div class="loader"></div></td></tr>';
+  try {
+    const data = await api('GET', '/api/users');
+    const users = data?.users || data || [];
+    if (!users.length) {
+      tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><p>Nenhum usuário</p></div></td></tr>';
+    } else {
+      tbody.innerHTML = users.map(u => `
+        <tr>
+          <td style="color:var(--text);font-weight:500">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="user-av" style="width:28px;height:28px;font-size:.7rem">${(u.name||'U')[0].toUpperCase()}</div>
+              ${esc(u.name)}
+            </div>
+          </td>
+          <td style="font-family:'DM Mono',monospace;font-size:.78rem">${esc(u.email)}</td>
+          <td><span class="badge ${u.role}">${u.role}</span></td>
+          <td>${fmtDate(u.created_at)}</td>
+          <td>
+            ${u.id !== CURRENT_USER?.id ? `
+            <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="deleteUser(${u.id})" title="Remover">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+            </button>` : '<span style="color:var(--text-3);font-size:.75rem">Você</span>'}
+          </td>
+        </tr>`).join('');
+    }
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--red);padding:20px">${e.message}</td></tr>`;
+  }
+}
+
+function openUserModal() {
+  document.getElementById('user-name-input').value  = '';
+  document.getElementById('user-email-input').value = '';
+  document.getElementById('user-pass-input').value  = '';
+  document.getElementById('user-role-input').value  = 'agent';
+  openModal('modal-user');
+}
+
+async function saveUser() {
+  const body = {
+    name:     document.getElementById('user-name-input').value.trim(),
+    email:    document.getElementById('user-email-input').value.trim(),
+    password: document.getElementById('user-pass-input').value,
+    role:     document.getElementById('user-role-input').value,
+  };
+  if (!body.name || !body.email || !body.password) return toast('Todos os campos são obrigatórios', 'error');
+  try {
+    await api('POST', '/api/users', body);
+    closeModal('modal-user');
+    toast('Usuário criado!', 'success');
+    loadUsers();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function deleteUser(id) {
+  if (!confirm('Remover este usuário?')) return;
+  try {
+    await api('DELETE', `/api/users/${id}`);
+    toast('Usuário removido.', 'success');
+    loadUsers();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MODAL HELPERS
+// ═══════════════════════════════════════════════════════════════
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════════════════════
+function toast(msg, type = 'info') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  const icons = {
+    success: '✓', error: '✕', info: 'ℹ'
+  };
+  el.innerHTML = `<span style="font-size:.9rem">${icons[type]||'•'}</span><span>${msg}</span>`;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════════════
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function statusLabel(s) {
+  return { new:'Novo', qualified:'Qualificado', converted:'Convertido', lost:'Perdido',
+           open:'Aberta', closed:'Fechada', pending:'Pendente', active:'Ativa',
+           sent:'Enviada', draft:'Rascunho' }[s] || s || '—';
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' });
+}
+
+function fmtTime(d) {
+  if (!d) return '';
+  const dt = new Date(d);
+  const now = new Date();
+  if (dt.toDateString() === now.toDateString())
+    return dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  return dt.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' });
+}
+
+function debounce(fn, ms) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+});
+
+// Login on Enter
+document.getElementById('login-pass')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════
+if (TOKEN) bootApp();
+</script>
+</body>
+</html>
